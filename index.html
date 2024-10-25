@@ -1,96 +1,338 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <script defer src="/_vercel/insights/script.js"></script>
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/@exampledev/new.css@1.1.2/new.min.css"
-    />
-    <title>Vercel HTML Starter</title>
-    <meta
-      name="description"
-      content="High-performance HTML based website template."
-    />
-  </head>
-  <body>
-    <h1>Vercel HTML Starter</h1>
-    <p>
-      This template is a simple, but powerful single
-      <code>index.html</code> file deployed to
-      <a href="https://vercel.com">Vercel</a>. When your site is deployed, all
-      static assets (like HTML, JavaScript, CSS, images, and more) are deployed
-      globally to every
-      <a href="https://vercel.com/docs/concepts/edge-network/overview"
-        >Vercel Edge Network</a
-      >
-      region.
-    </p>
-    <h2>Simple, privacy-friendly analytics</h2>
-    <p>
-      Want to understand your visitor traffic? Vercel Analytics gives you
-      first-party, privacy-friendly traffic analytics for your HTML site. This
-      template is already configured using the following script:
-    </p>
-    <pre><code>&lt;script defer src="/_vercel/insights/script.js"&gt;&lt;/script&gt;</code></pre>
-    <p>
-      Learn more about
-      <a href="https://vercel.com/analytics">Vercel Analytics</a>.
-    </p>
-    <h2>Integrated with git</h2>
-    <p>
-      Deploying updates to your site is as simple as
-      <code>git push</code> thanks to Vercel's advanced
-      <a href="https://vercel.com/docs/concepts/git">Git Integration</a>.
-      Support for GitHub, GitLab, Bitbucket is zero-configuration, and with the
-      flexible Vercel CLI and API, you can integrate with any tool possible.
-    </p>
-    <p>
-      Learn more about
-      <a href="https://vercel.com/docs/concepts/git">Git Integration</a>.
-    </p>
-    <h2>Fast <code>gzip</code> compression</h2>
-    <p>
-      To help ensure the smallest possible file sizes for your static assets,
-      the Vercel Edge Network compresses files by default using
-      <code>gzip</code>. You can also optionally use
-      <code>brotli</code> compressesion if you prefer.
-    </p>
-    <p>
-      Learn more about
-      <a href="https://vercel.com/docs/concepts/edge-network/compression"
-        >compression</a
-      >.
-    </p>
-    <h2>Advanced routing configuration</h2>
-    <p>
-      Vercel gives you a variety of ways to configure the routing of your
-      website. For example, adding redirects, rewrites, or headers to your page.
-      While you can use <code>vercel.json</code> to define these through JSON,
-      you can also express your routing configuration as code using
-      <a href="https://vercel.com/docs/concepts/functions/edge-middleware"
-        >Vercel Edge Middleware</a
-      >.
-    </p>
-    <p>
-      Middleware runs before the
-      <a href="https://vercel.com/docs/concepts/edge-network/caching"
-        >Vercel Edge Network Cache</a
-      >, so you can configure routing exactly as your application needs. For
-      example, this template uses <code>middleware.js</code> defined in the root
-      of the repository to add additional security headers to the site:
-    </p>
-    <pre><code>referrer-policy: origin-when-cross-origin
-strict-transport-security: max-age=31536000; includeSubDomains; preload
-x-content-type-options: nosniff
-x-dns-prefetch-control: on
-x-frame-options: DENY</code></pre>
-    <p>
-      Learn more about
-      <a href="https://vercel.com/docs/concepts/functions/edge-middleware"
-        >Vercel Edge Middleware</a
-      >.
-    </p>
-  </body>
-</html>
+<html lang="es" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de Recibos</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: "DM Sans", sans-serif;
+            font-optical-sizing: auto;
+            font-weight: 400;
+        }
+        
+        h1, h2, h3, .btn {
+            font-weight: 600;
+        }
+        
+        canvas {
+            background-color: var(--bs-body-bg);
+            border: 1px solid var(--bs-border-color);
+        }
+        
+        .theme-toggle:hover {
+            cursor: pointer;
+        }
+
+        .table th {
+            font-weight: 500;
+        }
+
+        .csv-controls {
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container py-4">
+        <header class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="h3">Generador de Recibos</h1>
+            <div class="d-flex gap-2">
+                <div class="csv-controls d-flex">
+                    <input type="file" id="csvFileInput" accept=".csv" class="d-none">
+                    <button class="btn btn-outline-primary" onclick="document.getElementById('csvFileInput').click()">
+                        Importar CSV
+                    </button>
+                    <button class="btn btn-outline-success" onclick="exportToCSV()">
+                        Exportar CSV
+                    </button>
+                </div>
+                <button class="btn btn-outline-light theme-toggle" id="themeToggle">
+                    Cambiar Tema
+                </button>
+            </div>
+        </header>
+
+        <div class="row g-4">
+            <!-- Formulario -->
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="h5 mb-0">Nuevo Recibo</h2>
+                    </div>
+                    <div class="card-body">
+                        <form id="receiptForm">
+                            <div class="mb-3">
+                                <label for="date" class="form-label">Fecha</label>
+                                <input type="date" class="form-control" id="date" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="receiptNumber" class="form-label">Número de Recibo</label>
+                                <input type="text" class="form-control" id="receiptNumber" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="amount" class="form-label">Monto</label>
+                                <input type="number" class="form-control" id="amount" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="paymentMethod" class="form-label">Método de Pago</label>
+                                <select class="form-select" id="paymentMethod" required>
+                                    <option value="">Seleccione el método de pago</option>
+                                    <option value="efectivo">Efectivo</option>
+                                    <option value="tarjeta">Tarjeta</option>
+                                    <option value="transferencia">Transferencia</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="receivedFrom" class="form-label">Recibido de</label>
+                                <input type="text" class="form-control" id="receivedFrom" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="concept" class="form-label">Concepto</label>
+                                <input type="text" class="form-control" id="concept" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="pendingBalance" class="form-label">Saldo Pendiente</label>
+                                <input type="number" class="form-control" id="pendingBalance" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Generar Recibo</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vista Previa -->
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="h5 mb-0">Vista Previa del Recibo</h2>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="receiptCanvas" width="400" height="500" class="w-100 mb-3"></canvas>
+                        <button id="downloadButton" class="btn btn-primary d-none">Descargar Recibo</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabla de Recibos -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h2 class="h5 mb-0">Recibos Generados</h2>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <input type="text" class="form-control" id="filterInput" placeholder="Filtrar por número de recibo">
+                </div>
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Número de Recibo</th>
+                                <th>Fecha</th>
+                                <th>Monto</th>
+                                <th>Método de Pago</th>
+                                <th>Recibido de</th>
+                                <th>Concepto</th>
+                                <th>Saldo Pendiente</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="receiptTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Logo y firma SVG (reemplaza estos con tus propios SVG)
+        const logoSvg = `
+            <svg width="100" height="50" viewBox="0 0 100 50">
+                <!-- Reemplaza esto con tu logo SVG -->
+                <rect x="10" y="10" width="80" height="30" fill="currentColor"/>
+                <text x="50" y="30" text-anchor="middle" fill="white">LOGO</text>
+            </svg>
+        `;
+
+        const signatureSvg = `
+            <svg width="200" height="50" viewBox="0 0 200 50">
+                <!-- Reemplaza esto con tu firma SVG -->
+                <path d="M10 25 C 20 10, 40 10, 60 25 S 80 40, 190 25" stroke="currentColor" fill="none"/>
+            </svg>
+        `;
+
+        // Estado de la aplicación
+        let currentReceipt = null;
+        let receipts = JSON.parse(localStorage.getItem('receipts') || '[]');
+
+        // Elementos del DOM
+        const form = document.getElementById('receiptForm');
+        const canvas = document.getElementById('receiptCanvas');
+        const downloadButton = document.getElementById('downloadButton');
+        const filterInput = document.getElementById('filterInput');
+        const tableBody = document.getElementById('receiptTableBody');
+        const themeToggle = document.getElementById('themeToggle');
+        const csvFileInput = document.getElementById('csvFileInput');
+
+        // Funciones auxiliares
+        function getFormData() {
+            return {
+                date: document.getElementById('date').value,
+                receiptNumber: document.getElementById('receiptNumber').value,
+                amount: document.getElementById('amount').value,
+                paymentMethod: document.getElementById('paymentMethod').value,
+                receivedFrom: document.getElementById('receivedFrom').value,
+                concept: document.getElementById('concept').value,
+                pendingBalance: document.getElementById('pendingBalance').value
+            };
+        }
+
+        function resetForm() {
+            form.reset();
+        }
+
+        function drawReceipt(receipt) {
+            const ctx = canvas.getContext('2d');
+            const isDark = document.documentElement.getAttribute('data-bs-theme') === 'dark';
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = isDark ? '#212529' : '#ffffff';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Dibuja el logo
+            const tempImg = new Image();
+            tempImg.src = 'data:image/svg+xml;base64,' + btoa(logoSvg);
+            tempImg.onload = () => {
+                ctx.drawImage(tempImg, (canvas.width - 100) / 2, 20);
+                
+                // Contenido del recibo
+                ctx.fillStyle = isDark ? '#ffffff' : '#000000';
+                ctx.font = '16px "DM Sans"';
+                
+                const startY = 120;
+                const lineHeight = 30;
+                
+                ctx.fillText(`Fecha: ${receipt.date}`, 20, startY);
+                ctx.fillText(`Número de Recibo: ${receipt.receiptNumber}`, 20, startY + lineHeight);
+                ctx.fillText(`Monto: $${receipt.amount}`, 20, startY + lineHeight * 2);
+                ctx.fillText(`Método de Pago: ${receipt.paymentMethod}`, 20, startY + lineHeight * 3);
+                ctx.fillText(`Recibido de: ${receipt.receivedFrom}`, 20, startY + lineHeight * 4);
+                ctx.fillText(`Concepto: ${receipt.concept}`, 20, startY + lineHeight * 5);
+                ctx.fillText(`Saldo Pendiente: $${receipt.pendingBalance}`, 20, startY + lineHeight * 6);
+                
+                // Dibuja la firma
+                const signatureImg = new Image();
+                signatureImg.src = 'data:image/svg+xml;base64,' + btoa(signatureSvg);
+                signatureImg.onload = () => {
+                    ctx.drawImage(signatureImg, (canvas.width - 200) / 2, startY + lineHeight * 8);
+                    ctx.fillText('_____________________', (canvas.width - 150) / 2, startY + lineHeight * 10);
+                    ctx.fillText('Firma Autorizada', (canvas.width - 100) / 2, startY + lineHeight * 11);
+                };
+            };
+        }
+
+        function updateTable(filteredReceipts = receipts) {
+            tableBody.innerHTML = filteredReceipts.map(receipt => `
+                <tr>
+                    <td>${receipt.receiptNumber}</td>
+                    <td>${receipt.date}</td>
+                    <td>$${receipt.amount}</td>
+                    <td>${receipt.paymentMethod}</td>
+                    <td>${receipt.receivedFrom}</td>
+                    <td>${receipt.concept}</td>
+                    <td>$${receipt.pendingBalance}</td>
+                    <td>
+                        <button class="btn btn-danger btn-sm" onclick="deleteReceipt('${receipt.receiptNumber}')">
+                            Eliminar
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function exportToCSV() {
+            const headers = ['date', 'receiptNumber', 'amount', 'paymentMethod', 'receivedFrom', 'concept', 'pendingBalance'];
+            const csvContent = [
+                headers.join(','),
+                ...receipts.map(receipt => 
+                    headers.map(header => receipt[header]).join(',')
+                )
+            ].join('\n');
+
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'recibos.csv';
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }
+
+        function importCSV(file) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const csvData = event.target.result;
+                const lines = csvData.split('\n');
+                const headers = lines[0].split(',');
+                
+                const importedReceipts = lines.slice(1)
+                    .filter(line => line.trim())
+                    .map(line => {
+                        const values = line.split(',');
+                        return headers.reduce((obj, header, index) => {
+                            obj[header] = values[index];
+                            return obj;
+                        }, {});
+                    });
+
+                receipts = importedReceipts;
+                localStorage.setItem('receipts', JSON.stringify(receipts));
+                updateTable();
+            };
+            reader.readAsText(file);
+        }
+
+        // Event Listeners
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            currentReceipt = getFormData();
+            receipts = [...receipts, currentReceipt];
+            localStorage.setItem('receipts', JSON.stringify(receipts));
+            drawReceipt(currentReceipt);
+            downloadButton.classList.remove('d-none');
+            resetForm();
+            updateTable();
+        });
+
+        downloadButton.addEventListener('click', () => {
+            const link = document.createElement('a');
+            link.download = `recibo-${currentReceipt.receiptNumber}.png`;
+            link.href = canvas.toDataURL();
+            link.click();
+        });
+
+        filterInput.addEventListener('input', (e) => {
+            const filterValue = e.target.value.toLowerCase();
+            const filteredReceipts = receipts.filter(receipt => 
+                receipt.receiptNumber.toLowerCase().includes(filterValue)
+            );
+            updateTable(filteredReceipts);
+        });
+
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = document.documentElement.getAttribute('data-bs-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-bs-theme', newTheme);
+            if (currentReceipt) {
+                drawReceipt(currentReceipt);
+            }
+        });
+
+        csvFileInput.addEventListener('change', (e) => {
+            if (e.target.files.length >
